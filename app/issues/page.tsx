@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CreateIssueModal from "../components/CreateIssueModal";
+import EditIssueModal from "../components/EditIssueModal";
 
 interface Post {
   id: number;
@@ -11,6 +12,39 @@ interface Post {
 
 export default function Issues() {
   const [issues, setIssues] = useState([]);
+  const [editIssueModal, setEditIssueModal] = useState(false);
+
+  // Fetch the issues from the API
+  const fetchIssues = async () => {
+    try {
+      const data = await fetch("http://localhost:3001/issues");
+      const issues = await data.json();
+      setIssues(issues); // Set the issues state
+    } catch (error) {
+      console.error("Error fetching issues:", error);
+    }
+  };
+
+  const handleEdit = async (id: number) => {
+    try {
+      setEditIssueModal(true);
+      // Call your API to delete the post
+      const response = await fetch(`http://localhost:3001/issues/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      // Optionally, you can show a success notification
+      console.log("Post deleted successfully");
+      fetchIssues();
+    } catch (error) {
+      // Handle errors here (e.g., show an error notification)
+      console.error("Error deleting post:", error);
+    }
+  };
 
   const handleDelete = async (id: number) => {
     try {
@@ -25,6 +59,7 @@ export default function Issues() {
 
       // Optionally, you can show a success notification
       console.log("Post deleted successfully");
+      fetchIssues();
     } catch (error) {
       // Handle errors here (e.g., show an error notification)
       console.error("Error deleting post:", error);
@@ -45,7 +80,7 @@ export default function Issues() {
               <strong>{post.title}</strong>: {post.description}
               <div className="flex items-center gap-1 mt-2">
                 <button
-                  // onClick={() => handleEdit(post)}
+                  onClick={() => handleEdit(post)}
                   className="mr-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
                 >
                   Edit
@@ -62,7 +97,12 @@ export default function Issues() {
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <CreateIssueModal setIssues={setIssues} />
+          <CreateIssueModal fetchIssues={fetchIssues} />
+          <EditIssueModal
+            editIssueModal={editIssueModal}
+            setEditIssueModal={setEditIssueModal}
+            fetchIssues={fetchIssues}
+          />
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">

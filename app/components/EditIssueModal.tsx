@@ -4,7 +4,11 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function CreateIssueModal({ fetchIssues }: any) {
+export default function EditIssueModal({
+  fetchIssues,
+  setEditIssueModal,
+  editIssueModal,
+}: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -49,27 +53,16 @@ export default function CreateIssueModal({ fetchIssues }: any) {
   }, []);
 
   function closeModal() {
-    setIsOpen(false);
+    setEditIssueModal(false);
   }
 
   function openModal() {
-    setIsOpen(true);
+    setEditIssueModal(true);
   }
 
   return (
     <>
-      <div className="flex gap-4 items-center flex-col sm:flex-row">
-        <button
-          type="button"
-          onClick={openModal}
-          className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 tracking-widest"
-        >
-          Create a new issue
-        </button>
-        <Link href="/"> Go Back</Link>
-      </div>
-
-      <Transition appear show={isOpen} as={Fragment}>
+      <Transition appear show={editIssueModal} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
             as={Fragment}
