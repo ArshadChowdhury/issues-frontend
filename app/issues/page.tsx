@@ -13,6 +13,7 @@ interface Post {
 export default function Issues() {
   const [issues, setIssues] = useState([]);
   const [editIssueModal, setEditIssueModal] = useState(false);
+  const [editValue, setEditValue] = useState({});
 
   // Fetch the issues from the API
   const fetchIssues = async () => {
@@ -29,16 +30,15 @@ export default function Issues() {
     try {
       setEditIssueModal(true);
       // Call your API to delete the post
-      const response = await fetch(`http://localhost:3001/issues/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`http://localhost:3001/issues/${id}`);
+      const issue = await response.json();
+
+      setEditValue(issue);
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      // Optionally, you can show a success notification
-      console.log("Post deleted successfully");
       fetchIssues();
     } catch (error) {
       // Handle errors here (e.g., show an error notification)
@@ -80,7 +80,7 @@ export default function Issues() {
               <strong>{post.title}</strong>: {post.description}
               <div className="flex items-center gap-1 mt-2">
                 <button
-                  onClick={() => handleEdit(post)}
+                  onClick={() => handleEdit(post.id)}
                   className="mr-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
                 >
                   Edit
@@ -99,6 +99,7 @@ export default function Issues() {
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <CreateIssueModal fetchIssues={fetchIssues} />
           <EditIssueModal
+            editValue={editValue}
             editIssueModal={editIssueModal}
             setEditIssueModal={setEditIssueModal}
             fetchIssues={fetchIssues}

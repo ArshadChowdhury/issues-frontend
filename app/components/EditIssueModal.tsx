@@ -8,44 +8,51 @@ export default function EditIssueModal({
   fetchIssues,
   setEditIssueModal,
   editIssueModal,
+  editValue,
 }: any) {
   const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(editValue.title || "");
+  const [description, setDescription] = useState(editValue.description || "");
+
+  console.log(editValue);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log(e);
+
     try {
-      const response = await fetch("http://localhost:3001/issues", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3001/issues/${editValue.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            description,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to submit the issue");
       }
 
-      const data = await response.json();
-      console.log("Issue submitted successfully:", data);
-
-      // Clear the form and close the modal
-      setTitle("");
-      setDescription("");
       closeModal();
-
-      // Refetch issues after form submission
       fetchIssues();
     } catch (error) {
       console.error("Error submitting the issue:", error);
     }
   };
+
+  useEffect(() => {
+    if (editValue) {
+      setTitle(editValue.title || "");
+      setDescription(editValue.description || "");
+    }
+  }, [editValue]);
 
   // UseEffect to fetch issues on initial load
   useEffect(() => {
@@ -92,11 +99,11 @@ export default function EditIssueModal({
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Create new issue
+                    Edit issue
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      You can create new issue by filling out this form.
+                      You can edit your issue by filling out this form.
                     </p>
                     {/* Form for Title and Description */}
                     <form onSubmit={handleSubmit} className="mt-4">
@@ -143,7 +150,7 @@ export default function EditIssueModal({
                           type="submit"
                           className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         >
-                          Submit Issue
+                          Edit Issue
                         </button>
                         <button
                           type="button"
