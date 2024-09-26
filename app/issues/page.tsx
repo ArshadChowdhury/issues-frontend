@@ -47,6 +47,16 @@ export default function Issues() {
   };
 
   const handleDelete = async (id: number) => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this issue?"
+    );
+
+    if (!isConfirmed) {
+      // If the user cancels, exit the function
+      return;
+    }
+
     try {
       // Call your API to delete the post
       const response = await fetch(`http://localhost:3001/issues/${id}`, {
@@ -59,7 +69,7 @@ export default function Issues() {
 
       // Optionally, you can show a success notification
       console.log("Post deleted successfully");
-      fetchIssues();
+      fetchIssues(); // Refresh the list of issues after deletion
     } catch (error) {
       // Handle errors here (e.g., show an error notification)
       console.error("Error deleting post:", error);
